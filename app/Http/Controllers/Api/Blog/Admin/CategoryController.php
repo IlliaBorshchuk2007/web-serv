@@ -15,7 +15,22 @@ class CategoryController extends BaseController
 
     public function store(\Illuminate\Http\Request $request)
     {
-        // зробити самостійно (аналогічно до update)
+        $data = $request->all();
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['title']);
+        }
+
+        $item = BlogCategory::create($data);
+
+        if ($item) {
+            return [
+                'success' => true,
+                'message' => 'Успішно збережено',
+                'data' => $item
+            ];
+        } else {
+            return ['message' => 'Помилка збереження'];
+        }
     }
 
     public function update(\Illuminate\Http\Request $request, $id)
