@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Blog\Controller;
 use Illuminate\Http\Request;
 
 class RestTestController extends Controller
