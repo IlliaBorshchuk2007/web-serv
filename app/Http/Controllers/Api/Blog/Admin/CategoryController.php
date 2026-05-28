@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Blog\Admin;
 
 use App\Models\BlogCategory;
+use App\Http\Requests\BlogCategoryUpdateRequest;
+use App\Http\Requests\BlogCategoryCreateRequest;
 use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
@@ -13,9 +15,9 @@ class CategoryController extends BaseController
         return $paginator;
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(BlogCategoryCreateRequest $request)
     {
-        $data = $request->all();
+        $data = $request->input();
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
         }
@@ -33,14 +35,14 @@ class CategoryController extends BaseController
         }
     }
 
-    public function update(\Illuminate\Http\Request $request, $id)
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {
         $item = BlogCategory::find($id);
         if (empty($item)) {
             return ['message' => "Запис id=[{$id}] не знайдено"];
         }
 
-        $data = $request->all();
+        $data = $request->input();
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']);
         }
