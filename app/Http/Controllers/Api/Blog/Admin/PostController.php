@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\Api\Blog\Admin;
 
 use App\Models\BlogPost;
+use App\Jobs\BlogPostAfterCreateJob;
+use App\Jobs\BlogPostAfterDeleteJob;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
 use App\Http\Requests\BlogPostCreateRequest;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class PostController extends BaseController
 {
+    use DispatchesJobs;
+
     private BlogCategoryRepository $blogCategoryRepository;
 
     public function __construct(private BlogPostRepository $blogPostRepository)
     {
-        //parent::__construct();
         $this->blogCategoryRepository = new BlogCategoryRepository();
     }
 
@@ -31,6 +35,8 @@ class PostController extends BaseController
         $item = (new BlogPost())->create($data);
 
         if ($item) {
+            $job = new BlogPostAfterCreateJob($item);
+            $this->dispatch($job);
             return ['success' => true, 'message' => 'Успішно збережено'];
         } else {
             return ['msg' => 'Помилка збереження'];
@@ -45,14 +51,10 @@ class PostController extends BaseController
         }
 
         $data = $request->input();
-
         $result = $item->update($data);
 
         if ($result) {
-            return [
-                'success' => true,
-                'message' => 'Успішно збережено'
-            ];
+            return ['success' => true, 'message' => 'Успішно збережено'];
         } else {
             return ['message' => 'Помилка збереження'];
         }
@@ -60,11 +62,10 @@ class PostController extends BaseController
 
     public function destroy($id)
     {
-        $result = BlogPost::destroy($id); //софт делит, запис лишається
-
-        //$result = BlogPost::find($id)->forceDelete(); //повне видалення з БД
+        $result = BlogPost::destroy($id);
 
         if ($result) {
+            BlogPostAfterDeleteJob::dispatch($id)->delay(20);
             return ['success' => true, 'message' => 'Успішно видалено'];
         } else {
             return ['message' => 'Помилка видалення'];
