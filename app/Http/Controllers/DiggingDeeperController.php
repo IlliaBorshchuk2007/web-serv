@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Jobs\ProcessVideoJob;
+use App\Jobs\GenerateCatalog\GenerateCatalogMainJob;
 use Carbon\Carbon;
 
 class DiggingDeeperController extends Controller
@@ -26,10 +28,6 @@ class DiggingDeeperController extends Controller
         $result['where']['count'] = $result['where']['data']->count();
         $result['where']['isEmpty'] = $result['where']['data']->isEmpty();
         $result['where']['isNotEmpty'] = $result['where']['data']->isNotEmpty();
-
-        if ($result['where']['data']->isNotEmpty()) {
-            //
-        }
 
         $result['where_first'] = $collection
             ->firstWhere('created_at', '>', '2020-02-24 03:46:16');
@@ -69,8 +67,7 @@ class DiggingDeeperController extends Controller
             }
             $byDay = $item->created_at->isFriday();
             $byDate = $item->created_at->day == 11;
-            $result = $byDay && $byDate;
-            return $result;
+            return $byDay && $byDate;
         });
 
         $sortedSimpleCollection = collect([5, 3, 1, 2, 4])->sort()->values();
@@ -78,5 +75,15 @@ class DiggingDeeperController extends Controller
         $sortedDescCollection = $collection->sortByDesc('item_id');
 
         dd(compact('sortedSimpleCollection', 'sortedAscCollection', 'sortedDescCollection'));
+    }
+
+    public function processVideo()
+    {
+        ProcessVideoJob::dispatch();
+    }
+
+    public function prepareCatalog()
+    {
+        GenerateCatalogMainJob::dispatch();
     }
 }
