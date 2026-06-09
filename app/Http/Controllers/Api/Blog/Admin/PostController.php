@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\Blog\Admin;
 
+use App\Models\BlogPost;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
+use App\Http\Requests\BlogPostCreateRequest;
 
 class PostController extends BaseController
 {
@@ -24,6 +24,19 @@ class PostController extends BaseController
         return $paginator;
     }
 
+    public function store(BlogPostCreateRequest $request)
+    {
+        $data = $request->input();
+
+        $item = (new BlogPost())->create($data);
+
+        if ($item) {
+            return ['success' => true, 'message' => 'Успішно збережено'];
+        } else {
+            return ['msg' => 'Помилка збереження'];
+        }
+    }
+
     public function update(BlogPostUpdateRequest $request, $id)
     {
         $item = $this->blogPostRepository->getEdit($id);
@@ -31,15 +44,7 @@ class PostController extends BaseController
             return ['message' => "Запис id=[{$id}] не знайдено"];
         }
 
-        $data = $request->all();
-
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
-        }
-
-        if (empty($data['published_at']) && $data['is_published']) {
-            $data['published_at'] = Carbon::now();
-        }
+        $data = $request->input();
 
         $result = $item->update($data);
 
@@ -50,6 +55,19 @@ class PostController extends BaseController
             ];
         } else {
             return ['message' => 'Помилка збереження'];
+        }
+    }
+
+    public function destroy($id)
+    {
+        $result = BlogPost::destroy($id); //софт делит, запис лишається
+
+        //$result = BlogPost::find($id)->forceDelete(); //повне видалення з БД
+
+        if ($result) {
+            return ['success' => true, 'message' => 'Успішно видалено'];
+        } else {
+            return ['message' => 'Помилка видалення'];
         }
     }
 }
