@@ -10,7 +10,7 @@ use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogPostUpdateRequest;
 use App\Http\Requests\BlogPostCreateRequest;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-
+use App\Http\Resources\Api\Blog\Admin\PostResource;
 class PostController extends BaseController
 {
     use DispatchesJobs;
@@ -25,7 +25,7 @@ class PostController extends BaseController
     public function index()
     {
         $paginator = $this->blogPostRepository->getAllWithPaginate();
-        return $paginator;
+        return PostResource::collection($paginator);
     }
 
     public function store(BlogPostCreateRequest $request)

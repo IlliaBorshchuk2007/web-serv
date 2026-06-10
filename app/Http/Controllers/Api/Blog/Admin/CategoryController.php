@@ -6,7 +6,7 @@ use App\Models\BlogCategory;
 use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
-
+use App\Http\Resources\Api\Blog\Admin\CategoryResource;
 class CategoryController extends BaseController
 {
     public function __construct(private BlogCategoryRepository $blogCategoryRepository)
@@ -17,9 +17,8 @@ class CategoryController extends BaseController
     public function index()
     {
         $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
-        return $paginator;
+        return CategoryResource::collection($paginator);
     }
-
     public function store(BlogCategoryCreateRequest $request)
     {
         $data = $request->input();
