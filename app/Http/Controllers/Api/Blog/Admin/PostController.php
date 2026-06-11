@@ -11,6 +11,7 @@ use App\Http\Requests\BlogPostUpdateRequest;
 use App\Http\Requests\BlogPostCreateRequest;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use App\Http\Resources\Api\Blog\Admin\PostResource;
+
 class PostController extends BaseController
 {
     use DispatchesJobs;
@@ -27,7 +28,14 @@ class PostController extends BaseController
         $paginator = $this->blogPostRepository->getAllWithPaginate();
         return PostResource::collection($paginator);
     }
-
+    public function show($id)
+    {
+        $item = $this->blogPostRepository->getEdit($id);
+        if (empty($item)) {
+            return ['message' => "Запис id=[{$id}] не знайдено"];
+        }
+        return new PostResource($item);
+    }
     public function store(BlogPostCreateRequest $request)
     {
         $data = $request->input();

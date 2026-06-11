@@ -18,6 +18,7 @@ class BlogCategory extends Model
         'slug',
         'parent_id',
         'description',
+        'is_published',  // ← додай це
     ];
 
     /**

@@ -16,12 +16,11 @@ $groupData = [
 ];
 Route::group($groupData, function () {
     //BlogCategory
-    $methods = ['index','store','update'];
+    $methods = ['index', 'store', 'update', 'show', 'destroy'];
     Route::apiResource('categories', \App\Http\Controllers\Api\Blog\Admin\CategoryController::class)
         ->only($methods)
         ->names('blog.admin.categories');
     //BlogPost
     Route::apiResource('posts', \App\Http\Controllers\Api\Blog\Admin\PostController::class)
-        ->except(['show'])
         ->names('blog.admin.posts');
 });

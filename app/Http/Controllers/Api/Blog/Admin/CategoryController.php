@@ -7,6 +7,7 @@ use App\Repositories\BlogCategoryRepository;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Http\Resources\Api\Blog\Admin\CategoryResource;
+
 class CategoryController extends BaseController
 {
     public function __construct(private BlogCategoryRepository $blogCategoryRepository)
@@ -16,8 +17,16 @@ class CategoryController extends BaseController
 
     public function index()
     {
-        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(50);
         return CategoryResource::collection($paginator);
+    }
+    public function show($id)
+    {
+        $item = $this->blogCategoryRepository->getEdit($id);
+        if (empty($item)) {
+            return ['message' => "Запис id=[{$id}] не знайдено"];
+        }
+        return new CategoryResource($item);
     }
     public function store(BlogCategoryCreateRequest $request)
     {
@@ -54,6 +63,24 @@ class CategoryController extends BaseController
             ];
         } else {
             return ['message' => 'Помилка збереження'];
+        }
+    }
+    public function destroy($id)
+    {
+        $item = $this->blogCategoryRepository->getEdit($id);
+        if (empty($item)) {
+            return ['message' => "Запис id=[{$id}] не знайдено"];
+        }
+
+        $result = $item->delete();
+
+        if ($result) {
+            return [
+                'success' => true,
+                'message' => 'Успішно видалено'
+            ];
+        } else {
+            return ['message' => 'Помилка видалення'];
         }
     }
 }

@@ -21,7 +21,7 @@
     const post = ref(null);
 
     const getPost = () => {
-        fetch(`http://127.0.0.1:8000/api/blog/posts/${route.params.id}`)
+        fetch(`/laravel-api/blog/posts/${route.params.id}`)
             .then(response => response.json())
             .then(data => {
                 post.value = data;
